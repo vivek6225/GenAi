@@ -42,8 +42,7 @@ async function startChat() {
         console.log("Rate limit reached. Waiting 60 seconds...\n");
         await sleep(60000);
       } else {
-        console.error("Error:", err.message); .
-  
+        console.error("Error:", err.message);
       }
 
     }
