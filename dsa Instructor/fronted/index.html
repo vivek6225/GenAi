@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Mentor AI | DSA Instructor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-slate-200 font-sans min-h-screen flex">
+
+    <aside class="w-64 bg-[#1e293b] border-r border-slate-700 p-6 hidden md:flex flex-col">
+        <div class="flex items-center gap-3 mb-10">
+            <div class="bg-blue-600 p-2 rounded-lg shadow-lg shadow-blue-900/40">
+                <i class="fas fa-robot text-xl text-white"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight">Code Mentor AI</h1>
+        </div>
+        
+        <nav class="space-y-2 flex-1">
+            <a href="#" class="flex items-center gap-3 p-3 bg-blue-600 text-white rounded-lg shadow-md">
+                <i class="fas fa-th-large w-5"></i> Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 p-3 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition">
+                <i class="fas fa-history w-5"></i> History
+            </a>
+            <a href="#" class="flex items-center gap-3 p-3 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition">
+                <i class="fas fa-code w-5"></i> Playground
+            </a>
+        </nav>
+
+        <div class="pt-6 border-t border-slate-700 text-xs text-slate-500">
+            v2.0 Powered by Gemini
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div class="max-w-4xl mx-auto">
+            
+            <div class="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 mb-6 flex gap-4">
+                <i class="fas fa-info-circle text-blue-400 text-lg mt-1"></i>
+                <p class="text-sm text-blue-200/80 leading-relaxed">
+                    <strong>How to use:</strong> Ask any coding or DSA question. The instructor is specialized in algorithms, data structures, and space/time complexity.
+                </p>
+            </div>
+
+            <div class="bg-[#1e293b] rounded-2xl border border-slate-700 p-6 mb-6 shadow-2xl">
+                <h4 class="flex items-center gap-2 font-semibold mb-4 text-slate-400 uppercase text-[10px] tracking-[0.2em]">
+                    <i class="fas fa-terminal text-blue-500"></i> Your Coding Question
+                </h4>
+                <textarea id="userInput" rows="5" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl p-4 text-slate-200 outline-none focus:ring-2 focus:ring-blue-500/50 transition resize-none placeholder:text-slate-600" placeholder="e.g., Explain QuickSort with a dry run..."></textarea>
+                
+                <button onclick="askInstructor()" id="sendBtn" class="w-full mt-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-blue-900/30">
+                    <i class="fas fa-paper-plane"></i> Ask Coding Instructor
+                </button>
+            </div>
+
+            <div class="bg-[#1e293b] rounded-2xl border border-slate-700 p-6 min-h-[150px] shadow-sm">
+                <h4 class="flex items-center gap-2 font-semibold mb-4 text-slate-400 uppercase text-[10px] tracking-[0.2em]">
+                    <i class="fas fa-graduation-cap text-green-500"></i> Instructor's Response
+                </h4>
+                <div id="responseArea" class="whitespace-pre-wrap leading-relaxed text-slate-300">
+                    <span class="text-slate-600 italic">Welcome to DSA Instructor! I'm here to help you optimize your logic.</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        async function askInstructor() {
+            const input = document.getElementById('userInput');
+            const output = document.getElementById('responseArea');
+            const btn = document.getElementById('sendBtn');
+            const text = input.value.trim();
+
+            if(!text) return;
+
+            // UI State: Loading
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> Processing...';
+            output.innerHTML = '<div class="flex items-center gap-2 text-blue-400"><i class="fas fa-brain animate-pulse"></i> Thinking...</div>';
+
+            try {
+                const res = await fetch("http://localhost:5000/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                const data = await res.json();
+                
+                if (data.error) throw new Error(data.error);
+                
+                output.innerText = data.text;
+            } catch (err) {
+                output.innerHTML = `<div class="text-red-400 flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i> Error: ${err.message}
+                </div>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Ask Coding Instructor';
+                input.value = "";
+            }
+        }
+    </script>
+</body>
+</html>
